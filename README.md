@@ -1,6 +1,6 @@
-Repo contains projects found in the backup drive.  
+Repo contains some old projects found in the backup drive.  
 
-PolyphaseSort - C++ implementation of Polyphase sorting, treating file as a block device. Written somewhere in ~2012. Good for reference.  
+PolyphaseSort - C++ implementation of Polyphase sorting, treating file as a block device. Written somewhere in ~2012. Good for reference.
   
 Psychonoid - pretty nice Asteroid clone, contains different configuration files, check those out!  
   
