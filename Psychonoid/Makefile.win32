@@ -1,0 +1,6 @@
+CC = cl -O2 /I.\sdl\include sdl.lib sdlmain.lib
+
+all: main.exe
+
+main.exe: main.cpp
+	$(CC) main.cpp

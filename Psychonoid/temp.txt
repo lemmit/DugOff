@@ -1,0 +1,200 @@
+// algorytm Bresenhama rysowania linii
+// http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+void CRenderer::Line(int x1, int y1, int x2, int y2, int color) {
+	int dx, dy, de, err, i, x, y, t;
+	int *scr = (int *)screen->pixels;
+	int pitch = screen->pitch / 4;
+
+	if(abs(x2 - x1) > abs(y2 - y1)) {
+		if(x1 > x2) {
+			t = x1; x1 = x2; x2 = t;
+			t = y1; y1 = y2; y2 = t;
+			};
+
+		t = x2 - x1;
+		de = abs(y2 - y1);
+		err = t / 2;
+		if(y2 > y1) dy = 1;
+		else dy = -1;
+
+		y = y1;
+		for(i = x1; i <= x2; i++) {
+			scr[i + y * pitch] = color;
+			err -= de;
+			if(err < 0) {
+				y += dy;
+				err += t;
+				};
+			};
+	} else {
+		if(y1 > y2) {
+			t = x1; x1 = x2; x2 = t;
+			t = y1; y1 = y2; y2 = t;
+			};
+
+		t = y2 - y1;
+		de = abs(x2 - x1);
+		err = t / 2;
+		if(x2 > x1) dx = 1;
+		else dx = -1;
+
+		x = x1;
+		for(i = y1; i <= y2; i++) {
+			scr[x + i * pitch] = color;
+			err -= de;
+			if(err < 0) {
+				x += dx;
+				err += t;
+				};
+			};
+		};
+	};
+
+
+
+// rysowanie grubej linii algorytmem Bresenhama
+// http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+void CRenderer::ThickLine(int x1, int y1, int x2, int y2, int color) {
+	int dx, dy, de, err, i, x, y, t;
+	int *scr = (int *)screen->pixels;
+	int pitch = screen->pitch / 4;
+
+	if(abs(x2 - x1) > abs(y2 - y1)) {
+		if(x1 > x2) {
+			t = x1; x1 = x2; x2 = t;
+			t = y1; y1 = y2; y2 = t;
+			};
+
+		t = x2 - x1;
+		de = abs(y2 - y1);
+		err = t / 2;
+		if(y2 > y1) dy = 1;
+		else dy = -1;
+
+		y = y1;
+		for(i = x1; i <= x2; i++) {
+			scr[i + y * pitch] = color;
+			scr[i + 1 + y * pitch] = color;
+			scr[i - 1 + y * pitch] = color;
+			scr[i + pitch + y * pitch] = color;
+			scr[i - pitch + y * pitch] = color;
+			err -= de;
+			if(err < 0) {
+				y += dy;
+				err += t;
+				};
+			};
+	} else {
+		if(y1 > y2) {
+			t = x1; x1 = x2; x2 = t;
+			t = y1; y1 = y2; y2 = t;
+			};
+
+		t = y2 - y1;
+		de = abs(x2 - x1);
+		err = t / 2;
+		if(x2 > x1) dx = 1;
+		else dx = -1;
+
+		x = x1;
+		for(i = y1; i <= y2; i++) {
+			scr[x + i * pitch] = color;
+			scr[x + 1 + i * pitch] = color;
+			scr[x - 1 + i * pitch] = color;
+			scr[x + pitch + i * pitch] = color;
+			scr[x - pitch + i * pitch] = color;
+			err -= de;
+			if(err < 0) {
+				x += dx;
+				err += t;
+				};
+			};
+		};
+	};
+
+
+
+/*
+// DrawScreen
+// rysowanie zawartosci ekranu
+void CRenderer::DrawScreen(double angle) {
+	int i, j, r, x, y, width, height;
+
+	// wypelnienie ekranu czarnym kolorem
+	//SDL_FillRect(screen, NULL, 0x000000);
+
+	StartDrawing();
+
+	width = screen->w;
+	height = screen->h;
+	
+	// wypelnienie ekranu czarnym kolorem
+	// w zaleznosci od komputera metoda ponizsza moze byc szybsza lub
+	// wolniejsza od SDL_FillRect
+	for(j = 0; j < height; j++) {
+		memset((char *)(screen->pixels) + j * screen->pitch, 0, width * 4);
+		};
+
+	// narysowanie tla
+	for(y = 0; y < 256; y++) {
+		for(x = 0; x < 256; x++) {
+			i = width / 2 - 128 + x;
+			j = height / 2 - 128 + y;
+			((int *)(screen->pixels))[i + j * (screen->pitch / 4)] = 0x00010101 * (x ^ y);
+			};
+		};
+	
+	// dlugosc obracajacych sie linii
+	r = 200;
+
+	// narysowanie linii i smug
+	DrawTrace(width / 2, height / 2, r, angle, 1, 0x010001);
+	ThickLine(width / 2, height / 2,
+		  width / 2 + r * sin(angle), height / 2 + r * cos(angle),
+		  0x00ff00);
+
+	DrawTrace(width / 2, height / 2, r, angle + M_PI, 1, 0x000101);
+	ThickLine(width / 2, height / 2,
+		  width / 2 + r * sin(angle + M_PI), height / 2 + r * cos(angle + M_PI),
+		  0xff0000);
+
+	DrawTrace(width / 2, height / 2, r, angle + M_PI / 2, 2, 0x010100);
+	Line(width / 2, height / 2,
+	     width / 2 + r * sin(angle + M_PI / 2), height / 2 + r * cos(angle + M_PI / 2),
+	     0x0000ff);
+
+	DrawTrace(width / 2, height / 2, r, angle + 3 * M_PI / 2, 2, 0x010101);
+	Line(width / 2, height / 2,
+	     width / 2 + r * sin(angle + 3 * M_PI / 2), height / 2 + r * cos(angle + 3 * M_PI / 2),
+	     0x808080);
+		 
+	StopDrawing();
+	}
+*/
+
+
+/*
+void CRenderer::DrawTrace(int cx, int cy, int r, double angle,
+						    int det, int colorBase) {
+	int col, x, y, px, py;
+	int *scr = (int *)screen->pixels;
+	int pitch = screen->pitch / 4;
+	double step;
+
+	col = 255;
+	step = 0.5 / (r * 2 * M_PI);
+	x = px = cx + r * sin(angle);
+	y = py = cy + r * cos(angle);
+	while(col > 0) {
+		scr[x + y * pitch] = colorBase * col;
+		while(px == x && py == y) {
+			angle += step;
+			x = cx + r * sin(angle);
+			y = cy + r * cos(angle);
+			};
+		px = x;
+		py = y;
+		col -= det;
+		};
+	};
+*/
